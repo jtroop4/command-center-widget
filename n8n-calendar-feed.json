@@ -1,0 +1,73 @@
+{
+  "name": "Command Center – Calendar Feed",
+  "nodes": [
+    {
+      "parameters": {
+        "path": "command-center-calendar",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "a1",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [0, 0],
+      "webhookId": "command-center-calendar"
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "calendar": { "__rl": true, "value": "primary", "mode": "list", "cachedResultName": "primary" },
+        "returnAll": true,
+        "options": {
+          "timeMin": "={{ $now.setZone('America/Halifax').startOf('day').toISO() }}",
+          "timeMax": "={{ $now.setZone('America/Halifax').startOf('day').plus({ days: 2 }).toISO() }}",
+          "singleEvents": true,
+          "orderBy": "startTime"
+        }
+      },
+      "id": "a2",
+      "name": "Get Events",
+      "type": "n8n-nodes-base.googleCalendar",
+      "typeVersion": 1.3,
+      "position": [220, 0],
+      "alwaysOutputData": true,
+      "credentials": {}
+    },
+    {
+      "parameters": {
+        "jsCode": "// Slim the events down to only what the header needs\nconst out = $input.all()\n  .map(i => i.json)\n  .filter(e => e && e.id && e.status !== 'cancelled')\n  // skip events you've declined\n  .filter(e => !(e.attendees || []).some(a => a.self && a.responseStatus === 'declined'))\n  .map(e => ({\n    title: e.summary || '(No title)',\n    start: e.start?.dateTime || e.start?.date,\n    end: e.end?.dateTime || e.end?.date,\n    allDay: !e.start?.dateTime,\n    location: e.hangoutLink ? 'Google Meet' : (e.location || '').split(',')[0],\n    link: e.hangoutLink || e.htmlLink || ''\n  }));\nreturn [{ json: { events: out } }];"
+      },
+      "id": "a3",
+      "name": "Shape Events",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [440, 0]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json.events }}",
+        "options": {
+          "responseHeaders": {
+            "entries": [
+              { "name": "Access-Control-Allow-Origin", "value": "*" },
+              { "name": "Cache-Control", "value": "no-store" }
+            ]
+          }
+        }
+      },
+      "id": "a4",
+      "name": "Respond",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [660, 0]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Get Events", "type": "main", "index": 0 }]] },
+    "Get Events": { "main": [[{ "node": "Shape Events", "type": "main", "index": 0 }]] },
+    "Shape Events": { "main": [[{ "node": "Respond", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}

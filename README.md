@@ -1,31 +1,17 @@
-# 👋 Command Center Greeting Widget
+# Command Center Header (Notion embed)
 
-A dynamic greeting widget for Notion, built for **Jordan's Command Center** at Bruce Auto Group.
+Greeting, clock, date, Kentville weather (°C, 5-day) and today/tomorrow Google Calendar events, styled to match Notion dark mode.
 
-## Features
+## Publish
+GitHub Pages only serves **public** repos on a free plan. There are no secrets in this repo; the calendar URL is passed in the link instead.
+1. Settings → General → Danger Zone → Change visibility → **Public**
+2. Settings → Pages → Source: `main` / `(root)` → Save
+3. URL: `https://jtroop4.github.io/command-center-widget/`
 
-- **Time-aware greeting** — Good morning / afternoon / evening / night
-- **Live clock** — 12-hour format, updates every 10 seconds
-- **Real weather** — Pulls from [Open-Meteo](https://open-meteo.com/) (free, no API key) for Middleton, NS
-- **Dark theme** — Matches Notion dark mode with BAG brand accent (`#147EA3`)
-- **Smooth animations** — Staggered fade-in with ambient glow
+## Calendar (n8n)
+1. In n8n: Import `n8n-calendar-feed.json`, then pick your Google Calendar credential on **Get Events** and activate it.
+2. Copy the Production webhook URL from the Webhook node.
+3. Embed link: `https://jtroop4.github.io/command-center-widget/?cal=<webhook URL>`
 
-## Setup
-
-### 1. Enable GitHub Pages
-1. Go to your repo **Settings → Pages**
-2. Under **Source**, select `main` branch and `/ (root)`
-3. Click **Save**
-4. Your widget will be live at: `https://<your-username>.github.io/command-center-widget/`
-
-### 2. Embed in Notion
-1. In your Notion page, type `/embed`
-2. Paste your GitHub Pages URL
-3. Resize the embed block to fit (recommended: full width, ~160px height)
-
-## Customization
-
-Edit `index.html` to change:
-- **Name**: Search for `Jordan` and replace with any name
-- **Location**: Change the `lat` and `lon` values in the `fetchWeather()` function
-- **Accent color**: Update `--accent: #147EA3` in the CSS variables
+## Options (URL params)
+`name`, `place`, `lat`, `lon`, `theme=light`
