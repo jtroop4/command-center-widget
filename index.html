@@ -237,7 +237,7 @@
         + `&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,is_day`
         + `&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max`
         + `&timezone=${encodeURIComponent(CONFIG.tz)}&forecast_days=6`;
-      const d = await (await fetch(u)).json();
+      const r = await fetch(u); if (!r.ok) throw new Error('HTTP ' + r.status); const d = await r.json();
       const c = d.current;
       let [ico, desc] = wx(c.weather_code);
       if (!c.is_day && c.weather_code <= 1) ico = '🌙';
@@ -255,7 +255,7 @@
           <span class="pop">${pop >= 30 ? '💧' + pop + '%' : ''}</span></div>`;
       }).join('');
     } catch (e) {
-      $('wx-desc').textContent = 'Weather unavailable';
+      $('wx-desc').textContent = 'Weather error: ' + (e && e.message || e);
     }
   }
   loadWeather(); setInterval(loadWeather, 15 * 60 * 1000);
@@ -276,7 +276,7 @@
       if (!Array.isArray(list)) list = list.events || list.data || [];
       render(list);
     } catch (e) {
-      box.innerHTML = `<div class="empty">Couldn't reach the calendar feed.</div>`;
+      box.innerHTML = `<div class="empty">Couldn't reach the calendar feed.<br><span style="font-size:.7rem;opacity:.6">${esc(e && e.message || e)}</span></div>`;
     }
   }
 
