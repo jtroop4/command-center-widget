@@ -8,10 +8,13 @@ GitHub Pages only serves **public** repos on a free plan. There are no secrets i
 2. Settings → Pages → Source: `main` / `(root)` → Save
 3. URL: `https://jtroop4.github.io/command-center-widget/`
 
-## Calendar (n8n)
-1. In n8n: Import `n8n-calendar-feed.json`, then pick your Google Calendar credential on **Get Events** and activate it.
-2. Copy the Production webhook URL from the Webhook node.
-3. Embed link: `https://jtroop4.github.io/command-center-widget/?cal=<webhook URL>`
+## Calendar (Google Apps Script)
+1. Go to script.google.com → New project → paste `calendar-feed.gs` → Save.
+2. Deploy → New deployment → type **Web app** → Execute as **Me**, Who has access **Anyone** → Deploy → authorize.
+3. Copy the Web app URL (ends in `/exec`).
+4. Embed link: `https://jtroop4.github.io/command-center-widget/?cal=<that /exec URL>`
+
+(`n8n-calendar-feed.json` is an alternative if n8n is ever exposed over HTTPS.)
 
 ## Options (URL params)
 `name`, `place`, `lat`, `lon`, `theme=light`
