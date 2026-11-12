@@ -1,0 +1,2 @@
+# Claude Code local settings (can hold approved commands with secrets in them)
+.claude/settings.local.json
